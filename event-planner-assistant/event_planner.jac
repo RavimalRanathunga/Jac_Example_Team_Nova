@@ -1,3 +1,9 @@
+import from mtllm.llms {Gemini }
+
+# glob llm = OpenAI(model_name="gpt-4o",verbose=False);
+ glob llm =
+    Gemini(model_name="gemini-1.5-flash", verbose=False);
+
 # ========== NODE DEFINITIONS ==========
 
 node Event {
