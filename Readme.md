@@ -11,11 +11,11 @@ This is an example program written in the Jac programming language. This README 
 1. Open your terminal or command prompt.
 2. Clone the repository from GitHub:
    ```
-   git clone https://github.com/RavimalRanathunga/jac-example-program.git
+   git clone https://github.com/RavimalRanathunga/Jac_Example_Team_Nova.git
    ```
 3. Navigate to the project directory:
    ```
-   cd jac-example-program
+   cd Jac_Example_Team_Nova
    ```
 
 ## Creating a Virtual Environment
