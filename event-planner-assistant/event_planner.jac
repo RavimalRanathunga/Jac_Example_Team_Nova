@@ -1,54 +1,54 @@
-import from mtllm.llms {Gemini }
+import from mtllm.llms { Gemini }
 
-# glob llm = OpenAI(model_name="gpt-4o",verbose=False);
- glob llm =
-    Gemini(model_name="gemini-1.5-flash", verbose=False);
+glob llm = Gemini(model_name="gemini-2.0-flash", verbose=False);
 
 # ========== NODE DEFINITIONS ==========
 
 node Event {
-    has str name;
-    has str date;
-    has int guests;
+    has name: str;
+    has date: str;
+    has guests: int;
 }
 
 node ChecklistItem {
-    has str description;
-    has int priority = 0;
+    has description: str;
+    has priority: int = 0;
 }
 
 # ========== AGENT DEFINITIONS ==========
 
 agent EventAgent {
-    can create_event(str name, str date, int guests) {
+    can create_event(name: str, date: str, guests: int) {
         spawn here --> Event(name=name, date=date, guests=guests);
-        report "Event created: " + name + " on " + date + " for " + str(guests) + " guests.";
-        ChecklistAgent.generate_checklist(name, guests);
+        report "📅 Event created: " + name + " on " + date + " for " + str(guests) + " guests.";
+        ChecklistAgent.generate_checklist(name=name, guests=guests);
     }
 }
 
 agent ChecklistAgent {
-    can generate_checklist(str name, int guests) {
-        mtllm ask "Generate a checklist for organizing an event called " + name + " for " + str(guests) + " people. Return 10 lines as plain lines." -> str checklist_text;
-        report "Checklist from MTLLM:\n" + checklist_text;
+    can generate_checklist(name: str, guests: int) {
+        str checklist_text = llm("Generate a checklist for organizing an event called " + name +
+                  " for " + str(guests) + " people. Return 10 lines as plain lines.");
+
+        report "📝 Checklist from MTLLM:\n" + checklist_text;
 
         for line in checklist_text.split("\n") {
-            if (line != "") {
-                spawn here --> ChecklistItem(description=line);
+            if line.strip() != "" {
+                spawn here --> ChecklistItem(description=line.strip());
             }
         }
 
-        PriorityAgent.assign_priorities;
+        PriorityAgent.assign_priorities();
     }
 }
 
 agent PriorityAgent {
-    can assign_priorities {
-        for {has description} in here.out(ChecklistItem) {
-            str desc = .description;
-            mtllm ask "Assign a priority (1=low, 10=high) for this task: " + desc -> str p;
-            .priority = int(p);
-            report "Priority " + p + " set for: " + desc;
+    can assign_priorities() {
+        for item in here.out(ChecklistItem) {
+            str desc = item.description;
+            str p = llm("Assign a priority (1=low, 10=high) for this task: " + desc);
+            item.priority = int(p.strip());
+            report "⭐ Priority " + p.strip() + " set for: " + desc;
         }
     }
 }
@@ -56,7 +56,15 @@ agent PriorityAgent {
 # ========== WALKER TO START THE FLOW ==========
 
 walker start_planner {
-    can start {
-        EventAgent.create_event("birthday party", "2025-09-29", 10);
+    can start with entry;
+
+    can entry() {
+        EventAgent.create_event(name="birthday party", date="2025-09-29", guests=10);
     }
+}
+
+# ========== CLI ENTRY POINT ==========
+
+with entry:__main__ {
+    root spawn start_planner;
 }
