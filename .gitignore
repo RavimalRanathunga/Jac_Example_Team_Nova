@@ -1,3 +1,5 @@
 ./venv
 jac_env
 .env
+.vscode
+__pycache__
