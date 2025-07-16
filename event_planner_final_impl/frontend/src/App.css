@@ -1,0 +1,53 @@
+:root {
+  --primary: #4a6fa5;
+  --secondary: #166088;
+  --accent: #4fc08d;
+  --light: #f4f7f5;
+  --dark: #333333;
+  --error: #e74c3c;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--light);
+  color: var(--dark);
+  margin: 0;
+  padding: 0;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+h1 {
+  color: var(--primary);
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: var(--secondary);
+}
+
+.error {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: var(--error);
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .app {
+    padding: 0.5rem;
+  }
+}
