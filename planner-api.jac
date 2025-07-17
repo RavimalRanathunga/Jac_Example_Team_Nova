@@ -1,19 +1,19 @@
-import from mtllm.llms { Gemini }
 import uuid;
+import from mtllm {Model}
 
-glob llm = Gemini(model_name="gemini/gemini-2.0-flash", verbose=False);
+glob llm = Model(model_name = "gemini/gemini-2.0-flash");
 
 def analyze_event_needs(name: str, guests: str, type: str) -> str by llm();
-def generate_checklist(event_details: str, analysis: str) -> str by llm();
-def suggest_budget(event_details: str, checklist: str) -> str by llm();
+def generate_checklist(event_details: str, analysis: str) -> list[str] by llm();
+def suggest_budget(event_details: str, checklist: list[str]) -> int by llm();
 
 node Event{
-    has id:str=uuid.uuid4();
+    has id:str=str(uuid.uuid4());
     has event_name:str="";
     has number_of_guests:str = "";
     has event_type: str = "";
-    has budget:str="";
-    has checklist:str="";
+    has budget:int=0;
+    has checklist:list[str]=[];
 }
 
 walker create_event
@@ -33,8 +33,8 @@ walker create_event
 
         self.event_details= "Event: " + self.name + ", Guests: " + self.guests + ", Type: " + self.event_type;
         event_analysis:str = analyze_event_needs(self.name,self.guests,self.event_type);
-        checklist:str = generate_checklist(self.event_details,event_analysis);
-        budget:str = suggest_budget(self.event_details,checklist);
+        checklist:list[str] = generate_checklist(self.event_details,event_analysis);
+        budget:int = suggest_budget(self.event_details,checklist);
 
         event = root ++> Event(event_name=self.name,number_of_guests=self.guests,event_type=self.event_type,budget=budget,checklist=checklist);
 
@@ -62,13 +62,12 @@ walker get_events
     }
 }
 
-walker get_a_event
+walker get_event
 {
     has event_id:str;
 
     obj __specs__ {
         static has auth: bool = False;
-        static has methods: list = ["get"];
      }
 
     can get_event with `root entry
@@ -96,6 +95,7 @@ walker update_event
 
     obj __specs__ {
         static has auth: bool = False;
+        static has methods:list=["patch"];
      }
 
     can get_event with `root entry{
@@ -104,23 +104,23 @@ walker update_event
 
     if self.name
     {
-        target_event.event_name=name;
-        self.event_details+="Event: " + self.event_name;
+        target_event.event_name=self.name;
+        self.event_details+="Event: " + self.name;
     }
     if self.guests
     {
-        target_event.number_of_guests=guests;
-        self.event_details+=", Guests: " + self.number_of_guests;
+        target_event.number_of_guests=self.guests;
+        self.event_details+=", Guests: " + self.guests;
     }
     if self.event_type
     {
-        target_event.event_type=event_type;
+        target_event.event_type=self.event_type;
         self.event_details+=", Type: " + self.event_type;
     }
 
     event_analysis:str = analyze_event_needs(self.name,self.guests,self.event_type);
-    checklist:str = generate_checklist(self.event_details,event_analysis);
-    budget:str = suggest_budget(self.event_details,checklist);
+    checklist:list[str] = generate_checklist(self.event_details,event_analysis);
+    budget:int = suggest_budget(self.event_details,checklist);
 
     target_event.budget=budget;
     target_event.checklist=checklist;
@@ -133,18 +133,21 @@ walker update_event
 walker delete_event
 {
 
+    has event_id:str;
+
     obj __specs__ {
         static has auth: bool = False;
+        static has methods:list =["delete"];
      }
 
     can delete with `root entry{
     events = [-->(`?Event)](?id==self.event_id);
-    target_event=events[0];
 
-    if tareget_event{
+    if events{
+        target_event=events[0];
         del target_event;
 
-        report{"status":"Deleted","id":target_event.id};
+        report{"status":"Deleted","id":self.event_id};
     }
     else
     {
