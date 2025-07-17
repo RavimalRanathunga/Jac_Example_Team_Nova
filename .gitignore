@@ -2,3 +2,5 @@
 jac_env
 .env
 mydatabase
+.vscode
+__pycache__
