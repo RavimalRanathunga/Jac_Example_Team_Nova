@@ -30,7 +30,8 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const loadEvent = async () => {
       try {
-        const event = await getEvent(params.id)
+        const eventId ={event_id:params.id}
+        const event = await getEvent(eventId)
         setFormData({
           name: event.name,
           no_of_guests: event.no_of_guests.toString(),

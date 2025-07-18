@@ -57,7 +57,7 @@ export default async function DashboardPage() {
                 <Card key={event.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg">{event.name}</CardTitle>
+                      <CardTitle className="text-lg">{event.event_name}</CardTitle>
                       <Badge variant="secondary">{event.event_type}</Badge>
                     </div>
                     <CardDescription>Created {new Date(event.created_at).toLocaleDateString()}</CardDescription>
@@ -66,7 +66,7 @@ export default async function DashboardPage() {
                     <div className="space-y-2">
                       <div className="flex items-center text-sm text-gray-600">
                         <Users className="w-4 h-4 mr-2" />
-                        {event.no_of_guests} guests
+                        {event.number_of_guests} guests
                       </div>
                       <div className="flex items-center text-sm text-gray-600">
                         <DollarSign className="w-4 h-4 mr-2" />${event.budget.toLocaleString()}

@@ -1,5 +1,6 @@
 import uuid;
 import from mtllm {Model}
+import from datetime {datetime}
 
 glob llm = Model(model_name = "gemini/gemini-2.0-flash");
 
@@ -14,6 +15,17 @@ node Event{
     has event_type: str = "";
     has budget:float=0.00;
     has checklist:list[str]=[];
+    has created_by:str="";
+    has created_at:str=datetime.now().strftime("%Y-%m-%d %H:%M:%S");
+    has updated_at:str=datetime.now().strftime("%Y-%m-%d %H:%M:%S");
+}
+
+node Profile
+{
+    has id:str=str(uuid.uuid4());
+    has username:str="";
+    has email:str="";
+    has password:str="";
 }
 
 walker create_event
@@ -21,11 +33,12 @@ walker create_event
     has name:str;
     has guests:str;
     has event_type:str;
+    has created_by:str;
     has event_details:str="";
 
      obj __specs__ {
         static has auth: bool = False;
-     }
+    }
     
 
     can create with `root entry
@@ -36,21 +49,28 @@ walker create_event
         checklist:list[str] = generate_checklist(self.event_details,event_analysis);
         budget:float = suggest_budget(self.event_details,checklist);
 
-        event = root ++> Event(event_name=self.name,number_of_guests=self.guests,event_type=self.event_type,budget=budget,checklist=checklist);
+        users = [-->(`?Profile)](?id==self.created_by);
+
+        event = users[0] ++> Event(event_name=self.name,number_of_guests=self.guests,event_type=self.event_type,budget=budget,checklist=checklist,created_by=self.created_by);
+
+        report{"data":event[0]};
 
     }
 }
 
 walker get_events
 {
+    has created_by:str;
+
     obj __specs__ {
         static has auth: bool = False;
-        static has methods: list = ["get"];
      }
 
     can get_events with `root entry{
 
-        events = [-->(`?Event)];
+        profiles = [-->(`?Profile)](?id==self.created_by);
+        events = [profiles[0]-->(`?Event)];
+
         if(len(events)>0)
         {
             report {"data":events};
@@ -68,7 +88,6 @@ walker get_event
 
     obj __specs__ {
         static has auth: bool = False;
-        static has methods:list =["post"];
      }
 
     can get_event with `root entry
@@ -97,7 +116,7 @@ walker update_event
 
     obj __specs__ {
         static has auth: bool = False;
-        static has methods:list=["patch"];
+        static has methods:list=["put"];
      }
 
     can update_event with `root entry{
@@ -120,7 +139,7 @@ walker update_event
     
     target_event.budget=self.budget;
     target_event.checklist=self.checklist;
-
+    target_event.updated_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S");
     report {"status":"event updated succesfully"};
     }
 
@@ -149,5 +168,63 @@ walker delete_event
     {
         report{"status":"Unsuccessful"};
     }
+    }
+}
+
+walker register
+{
+    has username:str;
+    has email:str;
+    has password:str;
+
+    obj __specs__ {
+        static has auth: bool = False;
+    }
+
+    can register with `root entry
+    {
+        user = [-->(`?Profile)](?email==self.email);
+
+        if(len(user)>0)
+        {
+            report{"data":"User exsits"};
+        }
+        else
+        {
+            users=root++>Profile(username=self.username,password=self.password,email=self.email);
+            report {"data":users[0]};
+        }
+    }
+
+}
+
+walker login
+{
+    has email:str;
+    has password:str;
+
+    obj __specs__ {
+        static has auth: bool = False;
+    }
+
+    can login with `root entry
+    {
+        users = [-->(`?Profile)](?email==self.email);
+
+        if(users)
+        {
+            if(users[0].password == self.password)
+            {
+                report{"data":users[0].id};
+            }
+            else
+            {
+                report{"data":"Wrong Credentials"};
+            }
+        }
+        else
+        {
+            report {"data":"No account found"};
+        }
     }
 }

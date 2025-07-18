@@ -8,9 +8,9 @@ export interface User {
 
 export interface Event {
   id: string
-  user_id: string
-  name: string
-  no_of_guests: string
+  created_by: string
+  event_name: string
+  number_of_guests: string
   event_type: string
   checklist: string[]
   budget: number
@@ -22,7 +22,6 @@ export interface CreateEventData {
   name: string
   event_type: string
   guests:string
-
 }
 
 export interface UpdateEventData {
@@ -35,6 +34,10 @@ export interface UpdateEventData {
 }
 
 export interface DeleteEvent{
+  event_id:string
+}
+
+export interface GetEvent{
   event_id:string
 }
 
@@ -70,14 +73,19 @@ async function apiRequest(endpoint: string, options: RequestInit = {}) {
 
 // Auth API calls
 export async function loginUser(email: string, password: string): Promise<User> {
-  return apiRequest("/auth/login", {
+  const user = await apiRequest("/walker/login", {
     method: "POST",
     body: JSON.stringify({ email, password }),
   })
+
+  // Store user ID in localStorage
+  localStorage.setItem("user_id", user.id)
+
+  return user
 }
 
 export async function registerUser(name: string, email: string, password: string): Promise<User> {
-  return apiRequest("/auth/register", {
+  return apiRequest("/walker/register", {
     method: "POST",
     body: JSON.stringify({ name, email, password }),
   })
@@ -102,30 +110,49 @@ export async function logoutUser(): Promise<void> {
 
 // Event API calls
 export async function createEvent(eventData: CreateEventData): Promise<Event> {
+  const user_id = localStorage.getItem("user_id")
+
+  if (!user_id) {
+    throw new Error("User ID not found. User might not be logged in.")
+  }
+
+  const fullEventData = {
+    ...eventData,
+    user_id,
+  }
+
   return apiRequest("/walker/create_event", {
     method: "POST",
-    body: JSON.stringify(eventData),
+    body: JSON.stringify(fullEventData),
   })
 }
 
 export async function getEvents(): Promise<Event[]> {
-  return apiRequest("/walker/get_events")
+  const user_id = localStorage.getItem("user_id")
+  
+  return apiRequest("/walker/get_events", {
+    method: "POST",
+    body: JSON.stringify({ user_id }), // Only if your backend needs it
+  })
 }
 
-export async function getEvent(eventId: string): Promise<Event> {
-  return apiRequest(`/events/${eventId}`)
+export async function getEvent(eventId: GetEvent): Promise<Event> {
+  return apiRequest(`/walker/get_event`,{
+    method:"POST",
+    body:JSON.stringify(eventId)
+  })
 }
 
 export async function updateEvent(eventId: string, eventData: UpdateEventData): Promise<Event> {
   return apiRequest(`/events/${eventId}`, {
-    method: "PUT",
+    method: "PATCH",
     body: JSON.stringify(eventData),
   })
 }
 
 export async function deleteEvent(eventId: DeleteEvent): Promise<void> {
-  await apiRequest(`/events/${eventId}`, {
+  await apiRequest(`/walker/delete_event`, {
     method: "DELETE",
-    body:JSON.stringify(deleteEvent)
+    body:JSON.stringify(eventId)
   })
 }

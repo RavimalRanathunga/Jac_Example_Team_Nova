@@ -14,7 +14,10 @@ export default async function EventDetailsPage({ params }: { params: { id: strin
 
   let event
   try {
-    event = await getEvent(params.id)
+    const eventId ={
+      event_id:params.id
+    }
+    event = await getEvent(eventId)
   } catch (error) {
     notFound()
   }
@@ -49,7 +52,7 @@ export default async function EventDetailsPage({ params }: { params: { id: strin
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="text-2xl">{event.name}</CardTitle>
+                  <CardTitle className="text-2xl">{event.event_name}</CardTitle>
                   <CardDescription>
                     Created on {new Date(event.created_at).toLocaleDateString()}
                     {event.updated_at !== event.created_at && (
@@ -75,7 +78,7 @@ export default async function EventDetailsPage({ params }: { params: { id: strin
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Number of Guests:</span>
-                  <span className="font-medium">{event.no_of_guests}</span>
+                  <span className="font-medium">{event.number_of_guests}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Event Type:</span>
