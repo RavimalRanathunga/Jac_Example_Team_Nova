@@ -1,15 +1,31 @@
-import { requireAuth } from "@/lib/auth"
-import { getEvents } from "@/lib/api"
+"use client"
+
+import { useEffect, useState } from "react"
+import Link from "next/link"
+import { getEvents, Event } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
 import { Plus, Calendar, Users, DollarSign } from "lucide-react"
 import { LogoutButton } from "@/components/logout-button"
 
-export default async function DashboardPage() {
-  const user = await requireAuth()
-  const events = await getEvents()
+export default function DashboardPage() {
+  const [events, setEvents] = useState<Event[]>([])
+  const [username, setUsername] = useState("")
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getEvents()
+        setEvents(data)
+      } catch (err) {
+        console.error("Failed to fetch events", err)
+      }
+    }
+
+    fetchData()
+    setUsername(localStorage.getItem("username") || "")
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -18,7 +34,7 @@ export default async function DashboardPage() {
           <div className="flex justify-between items-center py-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Event Manager</h1>
-              <p className="text-gray-600">Welcome back, {user.name}</p>
+              <p className="text-gray-600">Welcome back, {username}</p>
             </div>
             <div className="flex items-center gap-4">
               <Link href="/create-event">
@@ -60,7 +76,9 @@ export default async function DashboardPage() {
                       <CardTitle className="text-lg">{event.event_name}</CardTitle>
                       <Badge variant="secondary">{event.event_type}</Badge>
                     </div>
-                    <CardDescription>Created {new Date(event.created_at).toLocaleDateString()}</CardDescription>
+                    <CardDescription>
+                      Created {new Date(event.created_at).toLocaleDateString()}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">

@@ -36,7 +36,11 @@ export default function CreateEventPage() {
       }
 
       const event = await createEvent(eventData)
-      router.push(`/events/${event.id}`)
+      if (event) {
+        router.push(`/events/${event.id}`)
+      } else {
+        setError("Failed to create event")
+      }
     } catch (error: any) {
       setError(error.message || "Failed to create event")
     } finally {
@@ -101,11 +105,11 @@ export default function CreateEventPage() {
               </div>
 
                <div className="space-y-2">
-                <Label htmlFor="guests">Event Type</Label>
+                <Label htmlFor="guests">No of Guests</Label>
                 <Input
                   id="guests"
                   type="text"
-                  placeholder="e.g., Wedding, Birthday Party"
+                  placeholder="2,10,20,..."
                   value={formData.guests}
                   onChange={(e) => handleInputChange("guests", e.target.value)}
                   required

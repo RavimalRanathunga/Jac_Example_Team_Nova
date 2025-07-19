@@ -32,13 +32,15 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
       try {
         const eventId ={event_id:params.id}
         const event = await getEvent(eventId)
+        if(event){
         setFormData({
-          name: event.name,
-          no_of_guests: event.no_of_guests.toString(),
+          name: event.event_name,
+          no_of_guests: event.number_of_guests.toString(),
           event_type: event.event_type,
           budget: event.budget.toString(),
           checklist: event.checklist.join("\n"),
         })
+      }
       } catch (error) {
         setError("Failed to load event")
       } finally {

@@ -1,6 +1,7 @@
 import uuid;
 import from mtllm {Model}
 import from datetime {datetime}
+import from fastapi {status,HTTPException}
 
 glob llm = Model(model_name = "gemini/gemini-2.0-flash");
 
@@ -26,6 +27,11 @@ node Profile
     has username:str="";
     has email:str="";
     has password:str="";
+}
+
+edge sign_in
+{
+    has sign_in:bool=False;
 }
 
 walker create_event
@@ -77,7 +83,7 @@ walker get_events
         }
         else
         {
-            report{"status":"No events found"};
+            report {data:[]};
         }
     }
 }
@@ -92,15 +98,16 @@ walker get_event
 
     can get_event with `root entry
     {
-        events = [-->(`?Event)](?id==self.event_id);
+        events = [-->-->(`?Event)](?id==self.event_id);
 
         if(len(events)>0)
         {
-        report {"event":events[0]};
+        report {"data":events[0]};
         }
         else
         {
-            report {"status":"Event not found"};
+            # report {"status":"Event not found"};
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"post with id: {self.event_id} not found");
         }
     }
 }
@@ -116,11 +123,15 @@ walker update_event
 
     obj __specs__ {
         static has auth: bool = False;
-        static has methods:list=["put"];
+        static has methods:list=["patch"];
      }
 
     can update_event with `root entry{
-    events = [-->(`?Event)](?id==self.event_id);
+    events = [-->-->(`?Event)](?id==self.event_id);
+    if(len(events)==0)
+    {
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {self.event_id} not found");
+    }
     target_event=events[0];
 
     if self.name
@@ -156,7 +167,11 @@ walker delete_event
      }
 
     can delete with `root entry{
-    events = [-->(`?Event)](?id==self.event_id);
+    events = [-->-->(`?Event)](?id==self.event_id);
+    if(len(events)==0)
+    {
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {self.event_id} not found");
+    }
 
     if events{
         target_event=events[0];
@@ -187,7 +202,7 @@ walker register
 
         if(len(user)>0)
         {
-            report{"data":"User exsits"};
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"{self.email} already registered");
         }
         else
         {
@@ -215,16 +230,21 @@ walker login
         {
             if(users[0].password == self.password)
             {
-                report{"data":users[0].id};
+                report{"data":users[0]};
             }
             else
             {
-                report{"data":"Wrong Credentials"};
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Wrong credentials");
             }
         }
         else
         {
-            report {"data":"No account found"};
+           raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No account found");
         }
     }
+}
+
+walker logout
+{
+
 }

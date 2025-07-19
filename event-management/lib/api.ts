@@ -1,9 +1,9 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://0.0.0.0:8000"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
 export interface User {
   id: string
   email: string
-  name: string
+  username: string
 }
 
 export interface Event {
@@ -60,7 +60,6 @@ async function apiRequest(endpoint: string, options: RequestInit = {}) {
       "Content-Type": "application/json",
       ...options.headers,
     },
-    credentials: "include", // Include cookies for session management
   })
 
   if (!response.ok) {
@@ -73,23 +72,39 @@ async function apiRequest(endpoint: string, options: RequestInit = {}) {
 
 // Auth API calls
 export async function loginUser(email: string, password: string): Promise<User> {
-  const user = await apiRequest("/walker/login", {
+  const res = await apiRequest("/walker/login", {
     method: "POST",
     body: JSON.stringify({ email, password }),
   })
 
-  // Store user ID in localStorage
-  localStorage.setItem("user_id", user.id)
+  const userId = res?.reports?.[0]?.data?.context.id
+  if (!userId) {
+    throw new Error("Login failed: user ID not found in response")
+  }
 
-  return user
+  localStorage.setItem("user_id", userId)
+  localStorage.setItem("username", res?.reports?.[0]?.data?.context.username)
+  // Optionally fetch full user details using the ID if needed
+  return { id: userId, email, username: res?.reports?.[0]?.data?.context.username } // <- use actual name/email if returned separately
 }
 
-export async function registerUser(name: string, email: string, password: string): Promise<User> {
-  return apiRequest("/walker/register", {
+
+export async function registerUser(username: string, email: string, password: string): Promise<User> {
+  const res = await apiRequest("/walker/register", {
     method: "POST",
-    body: JSON.stringify({ name, email, password }),
+    body: JSON.stringify({ username, email, password }),
   })
+
+  const userId = res?.reports?.[0]?.data?.context.id
+  if (!userId) {
+    throw new Error("Registration failed: user ID not found in response")
+  }
+
+  localStorage.setItem("user_id", userId)
+
+  return { id: userId, email,username}
 }
+
 
 export async function getCurrentUser(): Promise<User | null> {
   try {
@@ -109,42 +124,67 @@ export async function logoutUser(): Promise<void> {
 }
 
 // Event API calls
-export async function createEvent(eventData: CreateEventData): Promise<Event> {
-  const user_id = localStorage.getItem("user_id")
+export async function createEvent(eventData: CreateEventData): Promise<Event | null> {
+  const created_by = localStorage.getItem("user_id")
 
-  if (!user_id) {
+  if (!created_by) {
     throw new Error("User ID not found. User might not be logged in.")
   }
 
   const fullEventData = {
     ...eventData,
-    user_id,
+    created_by,
   }
 
-  return apiRequest("/walker/create_event", {
+  const res = await apiRequest("/walker/create_event", {
     method: "POST",
     body: JSON.stringify(fullEventData),
   })
+
+  if(res && res?.reports?.[0]?.data?.context)
+  {
+    console.log(res)
+    console.log("hi")
+    return res?.reports?.[0]?.data?.context
+  }
+  return null;
 }
 
 export async function getEvents(): Promise<Event[]> {
-  const user_id = localStorage.getItem("user_id")
-  
-  return apiRequest("/walker/get_events", {
+  const created_by = localStorage.getItem("user_id")
+
+  const res = await apiRequest("/walker/get_events", {
     method: "POST",
-    body: JSON.stringify({ user_id }), // Only if your backend needs it
+    body:JSON.stringify({created_by:created_by})
   })
+
+  // Make sure you extract .context from each item in reports[0].data
+  const rawEvents = res?.reports?.[0]?.data || []
+
+  // Map each item to its .context, and also include the top-level id for routing
+  const events = rawEvents.map((item: any) => ({
+    id: item.context.id, // or item.id if needed for routes
+    ...item.context,
+  }))
+
+  return events
 }
 
-export async function getEvent(eventId: GetEvent): Promise<Event> {
-  return apiRequest(`/walker/get_event`,{
+export async function getEvent(eventId: GetEvent): Promise<Event|null> {
+  const res = await apiRequest(`/walker/get_event`,{
     method:"POST",
     body:JSON.stringify(eventId)
   })
+
+  if(res && res?.reports?.[0]?.data?.context)
+  {
+    return res?.reports?.[0]?.data?.context
+  }
+  return null;
 }
 
 export async function updateEvent(eventId: string, eventData: UpdateEventData): Promise<Event> {
-  return apiRequest(`/events/${eventId}`, {
+  return apiRequest(`/walker/update_event`, {
     method: "PATCH",
     body: JSON.stringify(eventData),
   })

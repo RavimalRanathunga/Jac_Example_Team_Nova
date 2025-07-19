@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth"
+// import { getSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -6,11 +6,11 @@ import Link from "next/link"
 import { Calendar, Users, CheckSquare, DollarSign } from "lucide-react"
 
 export default async function HomePage() {
-  const user = await getSession()
+  // const user = await getSession()
 
-  if (user) {
-    redirect("/dashboard")
-  }
+  // if (user) {
+  //   redirect("/dashboard")
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
