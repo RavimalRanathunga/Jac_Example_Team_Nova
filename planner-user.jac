@@ -6,8 +6,8 @@ import from fastapi {status,HTTPException}
 glob llm = Model(model_name = "gemini/gemini-2.0-flash");
 
 def analyze_event_needs(name: str, guests: str, type: str) -> str by llm();
-def generate_checklist(event_details: str, analysis: str) -> list[str] by llm();
-def suggest_budget(event_details: str, checklist: list[str]) -> float by llm();
+def generate_checklist_as_List(event_details: str, analysis: str) -> list[str] by llm();
+def suggest_budget_as_Float(event_details: str, checklist: list[str]) -> float by llm();
 
 node Event{
     has id:str=str(uuid.uuid4());
@@ -52,8 +52,8 @@ walker create_event
 
         self.event_details= "Event: " + self.name + ", Guests: " + self.guests + ", Type: " + self.event_type;
         event_analysis:str = analyze_event_needs(self.name,self.guests,self.event_type);
-        checklist:list[str] = generate_checklist(self.event_details,event_analysis);
-        budget:float = suggest_budget(self.event_details,checklist);
+        checklist:list[str] = generate_checklist_as_List(self.event_details,event_analysis);
+        budget:float = suggest_budget_as_Float(self.event_details,checklist);
 
         users = [-->(`?Profile)](?id==self.created_by);
 
@@ -83,7 +83,7 @@ walker get_events
         }
         else
         {
-            report {data:[]};
+            report {"data":[]};
         }
     }
 }
