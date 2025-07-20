@@ -29,10 +29,6 @@ node Profile
     has password:str="";
 }
 
-edge sign_in
-{
-    has sign_in:bool=False;
-}
 
 walker create_event
 {
@@ -246,5 +242,13 @@ walker login
 
 walker logout
 {
-
+    obj __specs__ {
+        static has auth: bool = False;
+    }
+    
+    can logout with `root entry
+    {
+        report{"data":""};
+        disengage;
+    }
 }

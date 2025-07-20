@@ -118,7 +118,7 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 export async function logoutUser(): Promise<void> {
-  await apiRequest("/auth/logout", {
+  await apiRequest("/walker/logout", {
     method: "POST",
   })
 }

@@ -33,7 +33,7 @@ export default function SignupPage() {
 
     try {
       await registerUser(name, email, password)
-      router.push("/dashboard")
+      router.push("/login")
     } catch (error: any) {
       setError(error.message || "Registration failed")
     } finally {
