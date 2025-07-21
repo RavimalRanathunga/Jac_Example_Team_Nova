@@ -36,10 +36,10 @@ Create and activate a virtual environment to isolate dependencies:
 
 ### 3. Install Jac Language
 
-With your virtual environment activated, install Jac using pip:
+With your virtual environment activated, install Jac and dependencies using pip:
 
 ```
-pip install jac
+pip install -r requirements.txt
 ```
 
 ---
@@ -179,7 +179,34 @@ npm run dev
 ### 🧠 Run Jaseci Backend
 
 ```bash
-cd ../event-management-backend
+cd ../
+```
+
+Create or activate a virtual environment to isolate dependencies:
+
+- **On Windows:**
+  ```
+  python -m venv venv
+  venv\Scripts\activate
+  ```
+- **On macOS/Linux:**
+  ```
+  python3 -m venv venv
+  source venv/bin/activate
+  ```
+
+### 3. Install Jac Language
+
+With your virtual environment activated, install Jac and dependencies using pip:
+
+```
+pip install -r requirements.txt
+```
+
+---
+
+```bash
+cd event-management-backend
 ```
 
 Inside the Jaseci shell:
