@@ -146,12 +146,7 @@ Jac_Example_Team_Nova/
 
 - Node.js (v18 or newer)
 - npm / pnpm / yarn
-- Python 3.x with Jaseci CLI
-
-Install Jaseci:
-```bash
-pip install jaseci
-```
+- Python 3.x 
 
 ---
 
