@@ -198,8 +198,6 @@ With your virtual environment activated, install Jac and dependencies using pip:
 pip install -r requirements.txt
 ```
 
----
-
 ```bash
 cd event-management-backend
 ```
@@ -227,6 +225,3 @@ Built with ❤️ by **Team Nova**
 
 ---
 
-## 📄 License
-
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
