@@ -35,4 +35,4 @@ description = "Plan, organize, and manage your events with AI-assisted checklist
 theme_color = "#4f46e5"
 
 [byllm.model]
-default_model = "gemini/gemini-2.0-flash"
+default_model = "gemini/gemini-3.8-flash"

@@ -6,4 +6,4 @@ entry-point = "main.jac"
 kind = "cli"
 
 [byllm.model]
-default_model = "gemini/gemini-2.0-flash"
+default_model = "gemini/gemini-3.8-flash"
