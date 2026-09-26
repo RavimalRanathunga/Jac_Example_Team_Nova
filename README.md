@@ -1,3 +1,11 @@
+> **Jac 0.34.17 migration in progress.** `event-management-jac/` and
+> `event-planner-cli-jac/` are full rewrites of the two solutions below,
+> built on the modern single-binary `jac` toolchain (jac-client full-stack,
+> built-in auth, per-user graph isolation). See each folder's own README.
+> The original folders below (`event-planner-assistant/`,
+> `event-management-backend/`, `event-management-frontend/`) are being kept
+> until the new projects are verified, then will be removed.
+
 # Solution 1:Event Planner Assistant – Command Line Tool with AI
 
 <img width="1690" height="366" alt="Screenshot from 2025-07-16 11-01-07" src="https://github.com/user-attachments/assets/bc7cd50b-c89b-40f3-b01f-789534b1f70f" />

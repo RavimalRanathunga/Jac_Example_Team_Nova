@@ -1,0 +1,9 @@
+[project]
+name = "event-planner-cli"
+version = "1.0.0"
+description = "Event Planner Assistant - interactive CLI with AI-generated checklists and budgets"
+entry-point = "main.jac"
+kind = "cli"
+
+[byllm.model]
+default_model = "gemini/gemini-2.0-flash"
