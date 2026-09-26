@@ -7,7 +7,7 @@ def:pub Feature(title: str, description: str) -> JsxElement {
     </div>;
 }
 
-def:pub Home() -> JsxPage {
+def:pub HomePage() -> JsxElement {
     return <div className="bg-gradient-to-br from-indigo-50 to-blue-100 min-h-screen">
         <div className="mx-auto max-w-6xl px-4 py-16">
             <div className="mb-16 text-center">

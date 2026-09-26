@@ -1,10 +1,10 @@
 import from "@jac/runtime" { jacLogout, useNavigate, Link }
-sv import from ...events.store { Event, list_events }
-sv import from ...profile.store { get_profile }
-import from ...components.AppHeader { AppHeader }
-import from ...components.EventCard { EventCard }
+sv import from ..events.store { Event, list_events }
+sv import from ..profile.store { get_profile }
+import from ..components.AppHeader { AppHeader }
+import from ..components.EventCard { EventCard }
 
-def:pub DashboardPage() -> JsxPage {
+def:pub DashboardPage() -> JsxElement {
     has events: list[Event] = [],
         username: str = "",
         loading: bool = True;

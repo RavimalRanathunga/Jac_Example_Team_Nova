@@ -1,8 +1,8 @@
 import from "@jac/runtime" { Link, useNavigate }
-sv import from ...events.store { create_event }
-import from ...components.AppHeader { AppHeader }
+sv import from ..events.store { create_event }
+import from ..components.AppHeader { AppHeader }
 
-def:pub CreateEventPage() -> JsxPage {
+def:pub CreateEventPage() -> JsxElement {
     has name: str = "",
         event_type: str = "",
         guests: str = "",

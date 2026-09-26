@@ -1,8 +1,8 @@
 import from "@jac/runtime" { Link, useNavigate, useParams }
-sv import from ....events.store { Event, get_event, update_event, delete_event }
-import from ....components.AppHeader { AppHeader }
+sv import from ..events.store { Event, get_event, update_event, delete_event }
+import from ..components.AppHeader { AppHeader }
 
-def:pub EventDetailPage() -> JsxPage {
+def:pub EventDetailPage() -> JsxElement {
     has event: Event | None = None,
         loading: bool = True,
         notFound: bool = False,

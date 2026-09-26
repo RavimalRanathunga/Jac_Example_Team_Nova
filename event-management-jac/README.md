@@ -20,24 +20,27 @@ backend, persistence, auth and AI in one language, one project).
 
 ```
 event-management-jac/
-├── jac.toml              # project + client + byllm config
-├── main.jac               # entry point - registers every server endpoint
-├── global.css              # Tailwind v4 theme
-├── lib/utils.jac           # cn() class-merging helper
-├── events/store.jac        # Event node, byllm functions, CRUD endpoints
-├── profile/store.jac       # per-user display-name Profile node
-├── components/             # shared client components (header, event card)
-└── pages/                  # file-based routes
-    ├── layout.jac
-    ├── index.jac            # /            - landing page
-    ├── (public)/
-    │   ├── login.jac        # /login
-    │   └── signup.jac       # /signup
-    └── (auth)/              # every page below requires a login (auto-guarded)
-        ├── dashboard.jac    # /dashboard
-        ├── create-event.jac # /create-event
-        └── events/[id].jac  # /events/:id
+├── jac.toml               # project + client + byllm config
+├── main.jac                # entry point - registers every server endpoint
+├── global.css               # Tailwind v4 theme
+├── lib/utils.jac            # cn() class-merging helper
+├── events/store.jac         # Event node, byllm functions, CRUD endpoints
+├── profile/store.jac        # per-user display-name Profile node
+├── components/              # shared client components (header, event card)
+└── routes/                  # manual routing - one component per route
+    ├── AppShell.jac          # <Router><Routes>...</Routes></Router> + AuthGuard
+    ├── HomePage.jac          # /
+    ├── LoginPage.jac         # /login
+    ├── SignupPage.jac        # /signup
+    ├── DashboardPage.jac     # /dashboard          (behind AuthGuard)
+    ├── CreateEventPage.jac   # /create-event       (behind AuthGuard)
+    └── EventDetailPage.jac   # /events/:id         (behind AuthGuard)
 ```
+
+Routing is **manual** (`<Router>/<Routes>` from `@jac/runtime`, guarded with
+`<AuthGuard>`), not the newer file-based `pages/` convention - every shipped
+jac-client example (littleX, day_planner, todo_app, mini_todo) uses manual
+routing, so this keeps the app on that proven path.
 
 ## Running
 
