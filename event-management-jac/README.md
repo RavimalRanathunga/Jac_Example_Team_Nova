@@ -13,34 +13,51 @@ backend, persistence, auth and AI in one language, one project).
 - AI-generated planning checklist and budget suggestion per event (`by llm()`,
   Gemini by default)
 - Dashboard, create-event form, and a per-event detail/edit page
-- File-based routing with an automatic auth guard on every page under
-  `pages/(auth)/`
+- Everything runs as **one single service** - no sv-to-sv microservices
 
 ## Project layout
 
 ```
 event-management-jac/
-├── jac.toml               # project + client + byllm config
-├── main.jac                # entry point - registers every server endpoint
-├── global.css               # Tailwind v4 theme
-├── lib/utils.jac            # cn() class-merging helper
-├── events/store.jac         # Event node, byllm functions, CRUD endpoints
-├── profile/store.jac        # per-user display-name Profile node
-├── components/              # shared client components (header, event card)
-└── routes/                  # manual routing - one component per route
-    ├── AppShell.jac          # <Router><Routes>...</Routes></Router> + AuthGuard
-    ├── HomePage.jac          # /
-    ├── LoginPage.jac         # /login
-    ├── SignupPage.jac        # /signup
-    ├── DashboardPage.jac     # /dashboard          (behind AuthGuard)
-    ├── CreateEventPage.jac   # /create-event       (behind AuthGuard)
-    └── EventDetailPage.jac   # /events/:id         (behind AuthGuard)
+├── jac.toml                    # project + client + byllm config
+├── main.jac                     # entry point - registers every server endpoint
+├── global.css                    # Tailwind v4 theme
+├── lib/utils.jac                 # cn() class-merging helper
+├── events/store.sv.jac           # Event node, byllm functions, CRUD endpoints
+├── profile/store.sv.jac          # per-user display-name Profile node
+├── components/                   # shared client components (header, event card)
+│   ├── AppHeader.cl.jac
+│   └── EventCard.cl.jac
+└── routes/                       # manual routing - one component per route
+    ├── AppShell.cl.jac            # <Router><Routes>...</Routes></Router> + AuthGuard
+    ├── HomePage.cl.jac            # /
+    ├── LoginPage.cl.jac           # /login
+    ├── SignupPage.cl.jac          # /signup
+    ├── DashboardPage.cl.jac       # /dashboard          (behind AuthGuard)
+    ├── CreateEventPage.cl.jac     # /create-event       (behind AuthGuard)
+    └── EventDetailPage.cl.jac     # /events/:id         (behind AuthGuard)
 ```
 
-Routing is **manual** (`<Router>/<Routes>` from `@jac/runtime`, guarded with
-`<AuthGuard>`), not the newer file-based `pages/` convention - every shipped
-jac-client example (littleX, day_planner, todo_app, mini_todo) uses manual
-routing, so this keeps the app on that proven path.
+Two things are pinned explicitly rather than left to inference, matching the
+`jac create --kind web-app` default scaffold exactly:
+
+- **Routing is manual** (`<Router>/<Routes>` from `@jac/runtime`, guarded with
+  `<AuthGuard>`) - every shipped jac-client example (littleX, day_planner,
+  todo_app, mini_todo) uses manual routing rather than the newer file-based
+  `pages/` convention, so this keeps the app on that proven path.
+- **Every server module is an explicit `.sv.jac` file, every client module
+  that `sv import`s it is an explicit `.cl.jac` file** (`main.jac`'s client
+  section is wrapped in an explicit `cl { ... }` block too). `sv import` from
+  a module the compiler infers as *server* is a **different mechanism** than
+  from a module it infers as *client*: server-to-server `sv import` spawns
+  the imported module as its own sibling microservice process, while
+  client-to-server `sv import` is the normal in-process browser-to-backend
+  RPC call. An early version of this project left codespace placement to
+  inference and got `events`/`profile` `store.jac` registered as sibling
+  microservices instead of running as part of the one app process. Explicit
+  `.sv.jac`/`.cl.jac` extensions (the same pattern the default `web-app`
+  scaffold's `endpoints.sv.jac` + `frontend.cl.jac` use) remove that
+  ambiguity entirely.
 
 ## Running
 

@@ -16,9 +16,11 @@ import from events.store {
     delete_event
 }
 
-import "./global.css";
-import from .routes.AppShell { AppShell }
+cl {
+    import "./global.css";
+    import from .routes.AppShell { AppShell }
 
-def:pub app() -> JsxElement {
-    return <AppShell/>;
+    def:pub app() -> JsxElement {
+        return <AppShell/>;
+    }
 }
