@@ -74,8 +74,8 @@ jac start --dev main.jac
 
 Then open <http://localhost:8000>.
 
-> **Note:** this project was authored against the documented Jac 0.34.17
-> language/toolchain surface, but could not be executed inside the sandbox
-> this migration was written in (installing/running the `jac` binary is
-> blocked there). Run `jac check .` and `jac start --dev main.jac` locally
-> before relying on it, and please report anything that doesn't compile.
+> **Note:** authored against the documented Jac 0.34.17 language/toolchain
+> surface; the `jac` binary can't be installed/run inside the sandbox this
+> was written in, so it's being iterated on against real local runs instead.
+> If something doesn't compile or run, please share the exact `jac check`
+> / `jac start` output.
